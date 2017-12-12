@@ -3,8 +3,46 @@ import java.util.ArrayList;
 public class Search_Algorithms {
 
 	
-	public static int dijkstra(int[][] matrix, int source, int goal){
+	public static int bfs(Node source){
 		
+		ArrayList<Node> queue = new ArrayList<>();
+	
+		
+		if(source.getGoal()){
+			return source.getDepth();
+		}
+		
+		source.setDepth(0);
+		source.color = "grey";
+		
+		queue.add(source);
+		
+		while(!queue.isEmpty()){
+			Node currentNode = queue.remove(0);
+			for(Node neighbour : currentNode.getNeighbours()){
+				
+				if(neighbour.color.equals("white")){
+					neighbour.color = "grey";
+					neighbour.setDepth(currentNode.getDepth() + 1);
+					neighbour.setPredecessor(currentNode);
+					queue.add(neighbour);
+					
+					if(neighbour.getGoal()){
+						neighbour.setPredecessor(currentNode);
+						return currentNode.getDepth() + 1;
+					}
+				}
+				
+			}
+			currentNode.color = "black";
+		}
+		
+		return -1;
+	}
+	
+	
+	
+	public static int dijkstra(int[][] matrix, int source, int goal){
 		
 		// Initialize single source
 		int n = matrix.length;
@@ -48,9 +86,6 @@ public class Search_Algorithms {
 			}
 			
 		}
-		
-		
-		
 		
 		return costs[goal];
 	}
