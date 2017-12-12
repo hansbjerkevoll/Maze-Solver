@@ -1,5 +1,3 @@
-package prototype;
-
 import java.util.ArrayList;
 
 public class Main {
@@ -14,8 +12,8 @@ public class Main {
 		
 		pixelList[0] = new int[] {0,0,0,0,0,1,0,0,0,0};
 		pixelList[1] = new int[] {0,0,0,0,0,1,0,0,0,0};
-		pixelList[2] = new int[] {0,0,1,1,1,1,1,1,0,0};
-		pixelList[3] = new int[] {0,0,1,0,0,0,0,1,0,0};
+		pixelList[2] = new int[] {0,0,1,1,1,1,0,0,0,0};
+		pixelList[3] = new int[] {0,0,1,0,0,0,0,0,0,0};
 		pixelList[4] = new int[] {0,0,1,1,1,1,1,1,0,0};
 		pixelList[5] = new int[] {0,0,0,0,0,0,0,1,0,0};
 		pixelList[6] = new int[] {0,0,0,0,0,0,0,1,0,0};
@@ -33,6 +31,36 @@ public class Main {
 			}
 			System.out.println("(" + node.getX() + ", " + node.getY() + ") Neighbours: " + neighbours);
 		}
+		
+		int[][] matrix = new int[nodes.size()][nodes.size()];
+		
+		
+		for(int i = 0; i < nodes.size(); i++){
+			for(int j = 0; j < nodes.size(); j++){
+				Node node = nodes.get(i);
+				Node checknode = nodes.get(j);
+				
+				if(node.getNeighbours().contains(checknode)){
+					matrix[i][j] = 1;
+				}
+				else{
+					matrix[i][j] = 0;
+				}
+			}
+		}
+		
+		System.out.println("");
+		
+		for(int i = 0; i < matrix.length; i++){
+			String output = "";
+			for(int j = 0; j < matrix[i].length; j++){
+				output +=  matrix[i][j] + "  ";
+			}
+			
+			System.out.println(output);
+		}
+		
+		System.out.println("\nCost: " + Search_Algorithms.dijkstra(matrix, 0, matrix.length-1));
 		
 	}
 	
