@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class Search_Algorithms {
 
@@ -40,6 +41,42 @@ public class Search_Algorithms {
 		return -1;
 	}
 	
+	
+	public static int dfs(Node source){
+		Stack<Node> stack = new Stack<>();
+	
+		
+		if(source.getGoal()){
+			return source.getDepth();
+		}
+		
+		source.setDepth(0);
+		source.color = "grey";
+		
+		stack.push(source);
+		
+		while(!stack.isEmpty()){
+			Node currentNode = stack.pop();
+			for(Node neighbour : currentNode.getNeighbours()){
+				
+				if(neighbour.color.equals("white")){
+					neighbour.color = "grey";
+					neighbour.setDepth(currentNode.getDepth() + 1);
+					neighbour.setPredecessor(currentNode);
+					stack.add(neighbour);
+					
+					if(neighbour.getGoal()){
+						neighbour.setPredecessor(currentNode);
+						return currentNode.getDepth() + 1;
+					}
+				}
+				
+			}
+			currentNode.color = "black";
+		}
+		
+		return -1;
+	}
 	
 	
 	public static int dijkstra(int[][] matrix, int source, int goal){
