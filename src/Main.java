@@ -10,16 +10,16 @@ public class Main {
 		rowSize = 10;
 		colSize = 10;
 		
-		pixelList[0] = new int[] {0,0,0,0,0,1,0,0,0,0};
-		pixelList[1] = new int[] {0,0,0,0,0,1,0,0,0,0};
-		pixelList[2] = new int[] {0,0,1,1,1,1,0,0,0,0};
-		pixelList[3] = new int[] {0,0,1,0,0,0,0,0,0,0};
-		pixelList[4] = new int[] {0,0,1,1,1,1,1,1,0,0};
-		pixelList[5] = new int[] {0,0,0,0,0,0,0,1,0,0};
-		pixelList[6] = new int[] {0,0,0,0,0,0,0,1,0,0};
-		pixelList[7] = new int[] {0,0,0,0,0,1,1,1,0,0};
-		pixelList[8] = new int[] {0,0,0,0,0,1,0,0,0,0};
-		pixelList[9] = new int[] {0,0,0,0,0,1,0,0,0,0};
+		pixelList[0] = new int[] {0,0,0,0,1,0,0,0,0,0};
+		pixelList[1] = new int[] {0,1,1,1,1,0,1,1,1,0};
+		pixelList[2] = new int[] {0,1,0,0,0,0,1,0,1,0};
+		pixelList[3] = new int[] {0,1,1,1,1,1,1,0,1,0};
+		pixelList[4] = new int[] {0,0,1,0,0,1,0,0,1,0};
+		pixelList[5] = new int[] {0,0,1,1,1,1,1,1,1,0};
+		pixelList[6] = new int[] {0,0,1,0,1,0,0,0,1,0};
+		pixelList[7] = new int[] {0,0,1,0,1,0,0,0,1,0};
+		pixelList[8] = new int[] {0,0,1,1,1,1,1,1,1,0};
+		pixelList[9] = new int[] {0,0,0,0,1,0,0,0,0,0};
 		
 		ArrayList<Node> nodes = new ArrayList<>();
 		nodes = createNodes(pixelList);
@@ -60,7 +60,23 @@ public class Main {
 			System.out.println(output);
 		}
 		
-		System.out.println("\nCost: " + Search_Algorithms.dijkstra(matrix, 0, matrix.length-1));
+		System.out.println("\nCost: " + Search_Algorithms.bfs(nodes.get(0)));
+		
+		//Print path
+		Node node = nodes.get(nodes.size()-1);
+		String path = "("+node.getX() + ", " + node.getY() + ") ";
+		System.out.println();
+		while(!node.getStart()){
+			path += "("+node.getPredecessor().getX() + ", " + node.getPredecessor().getY() + ") ";
+			if(node.getPredecessor() != null){
+				node = node.getPredecessor();
+			}
+			else{
+				break;
+			}
+			
+		}
+		System.out.println(path);
 		
 	}
 	
