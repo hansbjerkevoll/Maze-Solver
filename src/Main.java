@@ -1,3 +1,4 @@
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -13,26 +14,30 @@ public class Main {
 	
 	public static void main(String[] args) throws IOException{
 		
-		String filename = "C:/Users/Hans Bjerkevoll/Documents/GitHub/Maze-Solver/src/img/maze1.png";
+		String filename = "C:/Users/Hans Bjerkevoll/Documents/GitHub/Maze-Solver/src/img/giant-maze.png";
 		
 		File file = new File(filename);
 		BufferedImage image = ImageIO.read(file);
+		image = convertToARGB(image);
 		
 		rowSize = image.getHeight();
 		colSize = image.getWidth();
 		
-		
-		//Scann the image and get list of pixels
-		int[][] pixelList = createPixelList(image);
-			
-		//Create all the nodes
 		ArrayList<Node> nodes = new ArrayList<>();
-		nodes = createNodes(pixelList);
+		
+		
+		//Initialize graph
+		long start = System.currentTimeMillis();
+		nodes = initialize(image);
+		long end = System.currentTimeMillis();
+		System.out.println("Scanning image: " + (end-start) + "ms");
 		
 		
 		//Solve the maze
-		Search_Algorithms.dfs(nodes.get(0));
-		
+		start = System.currentTimeMillis();
+		Search_Algorithms.bfs(nodes.get(0));
+		end = System.currentTimeMillis();
+		System.out.println("Solving maze: " + (end-start) + "ms");
 		
 		//Get solution to maze
 		ArrayList<Node> solution = new ArrayList<>();
@@ -51,7 +56,92 @@ public class Main {
 		File outputimage = new File(outputfilename);
 		ImageIO.write(image, "png", outputimage);
 		
+		
 	}
+	
+	private static ArrayList<Node> initialize(BufferedImage image){
+		
+		//Scann the image and create pixelList
+		int[][] pixelList = new int[rowSize][colSize];
+		
+		for(int y = 0; y < rowSize; y++){
+			for(int x = 0; x < colSize; x++){
+				int pixelValue = image.getRGB(x, y);
+				if(pixelValue == -1){
+					pixelList[y][x] = 1;
+				}
+				else{
+					pixelList[y][x] = 0;
+				}
+			}
+		}
+		
+		ArrayList<Node> nodes = new ArrayList<>();
+		Node previousNode = null;
+		Node[][] nodeList = new Node[rowSize][colSize];
+		
+		
+		//Iterate over the image and create nodes
+		for (int i = 0; i < pixelList.length; i++){
+			for(int j = 0; j < pixelList[i].length; j++){
+				int pixel = pixelList[i][j];
+				
+				//Skipping black pixels
+				if(pixel == 0){
+					previousNode = null;
+				}
+				
+				//Creating start and finish node
+				else if((i == 0 || i == pixelList.length -1)){
+					Node node = new Node(i, j);
+					nodeList[i][j] = node;
+					if(i == 0){
+						nodes.add(node);
+					}
+					else {
+						nodes.add(node);
+						//Add node up
+						for(int x = i-1; x >= 0; x--){
+							if(pixelList[x][j] == 0)continue;
+							if(nodeList[x][j] != null){
+								Node neighbour = nodeList[x][j];
+								node.addNeighbour(neighbour);
+								neighbour.addNeighbour(node);
+								break;
+							}
+						}
+					}
+				}
+				
+				//Creating node
+				else if(!((pixelList[i-1][j] == 0 && pixelList[i+1][j] == 0) || (pixelList[i][j-1] == 0 && pixelList[i][j+1] == 0))){
+					Node node = new Node(i, j);
+					nodeList[i][j] = node;
+					if(previousNode != null){
+						node.addNeighbour(previousNode);
+						previousNode.addNeighbour(node);
+					}
+					previousNode = node;
+					//Check if there is a node up
+					for(int x = i-1; x >= 0; x--){
+						if(pixelList[x][j] == 0)break;
+						if(nodeList[x][j] != null){
+							Node neighbour = nodeList[x][j];
+							node.addNeighbour(neighbour);
+							neighbour.addNeighbour(node);
+							break;
+						}
+					}
+					
+					nodes.add(node);
+				}
+			}
+			previousNode = null;
+		}
+		
+		return nodes;
+	}
+	
 	
 	private static void printSolution(ArrayList<Node> solution, BufferedImage image){
 		
@@ -94,144 +184,20 @@ public class Main {
 				}
 			}
 			
-			colorvalue += 250;
 		}
 		
 		
-	}
-	
-	private static int[][] createPixelList(BufferedImage image){
-		int[][] pixelList = new int[rowSize][colSize];
-		
-		for(int y = 0; y < rowSize; y++){
-			for(int x = 0; x < colSize; x++){
-				int pixelValue = image.getRGB(x, y);
-				if(pixelValue == -1){
-					pixelList[y][x] = 1;
-				}
-				else{
-					pixelList[y][x] = 0;
-				}
-			}
-		}
-		
-		return pixelList;
-	}
-	
-	private static ArrayList<Node> createNodes(int[][] pixelList){
-		
-		ArrayList<Node> nodes = new ArrayList<>();
-		
-		for (int i = 0; i < pixelList.length; i++){
-			for(int j = 0; j < pixelList[i].length; j++){
-				int pixel = pixelList[i][j];
-				
-				//Skipping black pixels
-				if(pixel == 0){
-					continue;
-				}
-				
-				//Creating start and finish node
-				if((i == 0 || i == pixelList.length -1)){
-					if(i == 0)nodes.add(new Node(i, j, true, false));
-					else nodes.add(new Node(i, j, false, true));					
-					continue;
-				}
-				
-				//Creating node
-				if(!((pixelList[i-1][j] == 0 && pixelList[i+1][j] == 0) || (pixelList[i][j-1] == 0 && pixelList[i][j+1] == 0))){
-					nodes.add(new Node(i, j));
-					continue;
-				}
-				
-			}
-		}
-		
-		//Create edges between nodes
-		createEdges(nodes, pixelList);
-		
-		return nodes;
-	}
-	
-	private static ArrayList<Node> createEdges(ArrayList<Node> nodes, int[][] pixelList){
-		
-		for(Node node : nodes){
-			
-			int x = node.getX();
-			int y = node.getY();
-			
-			
-			//Check if there is a node up
-			for(int i = x; i >= 0; i--){
-				boolean skip = false;
-				if(pixelList[i][y] == 0) break;
-				for(Node checkNode : nodes){
-					
-					if(node.equals(checkNode)) continue;
-					if(checkNode.getX() == i && checkNode.getY() == y){
-						node.addNeighbour(checkNode);
-						skip = true;
-						break;
-					}
-				}
-				if(skip)break;
-			}
-			
-			
-			//Check if there is a node down
-			for(int i = x; i < rowSize; i++){
-				boolean skip = false;
-				if(pixelList[i][y] == 0) break;
-				for(Node checkNode : nodes){					
-					if(node.equals(checkNode)) continue;
-					if(checkNode.getX() == i && checkNode.getY() == y){
-						node.addNeighbour(checkNode);
-						skip = true;
-						break;
-					}
-					
-				}
-				if(skip)break;
-			}
-			
-			
-			//Check if there is a node to the left
-			for(int i = y; i > 0; i--){
-				boolean skip = false;
-				if(pixelList[x][i] == 0) break;
-				for(Node checkNode : nodes){					
-					if(node.equals(checkNode)) continue;
-					if(checkNode.getX() == x && checkNode.getY() == i){
-						node.addNeighbour(checkNode);
-						skip = true;
-						break;
-					}
-					
-				}
-				if(skip)break;
-			}
-			
-			
-			//Check if there is a node to the right
-			for(int i = y; i < colSize; i++){
-				boolean skip = false;
-				if(pixelList[x][i] == 0) break;
-				for(Node checkNode : nodes){					
-					if(node.equals(checkNode)) continue;
-					if(checkNode.getX() == x && checkNode.getY() == i){
-						node.addNeighbour(checkNode);
-						skip = true;
-						break;
-					}
-					
-				}
-				if(skip)break;
-			}			
-		}
-		
-		return nodes;
 	}
 
+	
+	public static BufferedImage convertToARGB(BufferedImage image)
+	{
+	    BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+	    Graphics2D g = newImage.createGraphics();
+	    g.drawImage(image, 0, 0, null);
+	    g.dispose();
+	    return newImage;
+	}
 }
 
 
