@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -30,7 +31,7 @@ public class Main {
 		long start = System.currentTimeMillis();
 		nodes = initialize(image);
 		long end = System.currentTimeMillis();
-		System.out.println("Scanning image: " + (end-start) + "ms");
+		System.out.println("Initializing: " + (end-start) + "ms");
 		
 		
 		//Solve the maze
@@ -47,6 +48,8 @@ public class Main {
 			node = node.getPredecessor();
 			
 		}
+		
+		System.out.println("Solution length: " + calculateLength(solution) + "px");
 		
 		//Print solution
 		printSolution(solution, image);
@@ -145,7 +148,8 @@ public class Main {
 	
 	private static void printSolution(ArrayList<Node> solution, BufferedImage image){
 		
-		int colorvalue = -60000;
+		Color color = new Color(255, 0, 0);
+		boolean red_sinking = true;
 		
 		for(int i = 0; i < solution.size()-1; i++){
 			Node startnode = solution.get(i);
@@ -159,37 +163,56 @@ public class Main {
 			//Check if printing up
 			if(start_y < end_y){
 				for(int y = start_y; y <= end_y; y++){
-					image.setRGB(y, start_x, colorvalue);
+					image.setRGB(y, start_x, color.getRGB());
 				}
 			}
 			
 			//Check if printing down
 			else if(end_y < start_y){
 				for(int y = end_y; y <= start_y; y++){
-					image.setRGB(y, start_x, colorvalue);
+					image.setRGB(y, start_x, color.getRGB());
 				}
 			}
 			
 			//Check if printing right
 			else if(start_x < end_x){
 				for(int x = start_x; x <= end_x; x++){
-					image.setRGB(start_y, x, colorvalue);
+					image.setRGB(start_y, x, color.getRGB());
 				}
 			}
 			
 			//Check if printing left
 			else if(end_x < start_x){
 				for(int x = end_x; x <= start_x; x++){
-					image.setRGB(start_y, x, colorvalue);
+					image.setRGB(start_y, x, color.getRGB());
 				}
 			}
 			
+			if(color.getRed() == 255 && color.getBlue() < 255){
+				color = new Color(color.getRed(), 0, color.getBlue()+5);
+			}
+			if(color.getBlue() == 255 && color.getRed() > 0){
+				color = new Color(color.getRed()-5, 0, color.getBlue());
+			}
 		}
 		
 		
 	}
-
 	
+	private static int calculateLength(ArrayList<Node> solution){
+		int length = 0;
+		
+		for(int i = 0; i < solution.size()-1; i++){
+			int x_length = Math.abs(solution.get(i).getX() - solution.get(i+1).getX());
+			int y_length = Math.abs(solution.get(i).getY() - solution.get(i+1).getY());
+			
+			length += (x_length + y_length);
+
+		}
+		
+		return length;
+	}
+
 	public static BufferedImage convertToARGB(BufferedImage image)
 	{
 	    BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
