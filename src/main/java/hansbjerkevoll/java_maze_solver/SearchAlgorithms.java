@@ -34,7 +34,6 @@ public static int bfs(Node source){
 						return currentNode.getDepth() + 1;
 					}
 				}
-				
 			}
 			currentNode.color = "black";
 		}
