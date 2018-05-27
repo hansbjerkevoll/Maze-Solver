@@ -88,9 +88,11 @@ public class MazeSolver {
 					Node node = new Node(i, j);
 					nodeList[i][j] = node;
 					if(i == 0){
+						node.setStart(true);
 						nodes.add(node);
 					}
 					else {
+						node.setGoal(true);
 						nodes.add(node);
 						//Add node up
 						for(int x = i-1; x >= 0; x--){
@@ -135,8 +137,6 @@ public class MazeSolver {
 	}
 		
 	private WritableImage printSolution(ArrayList<Node> solution, Image image) {
-		
-		System.out.println(solution.size());
 		
 		WritableImage solutionImage = new WritableImage(image.getPixelReader(), rowSize, colSize);
 		PixelWriter pixelwriter = solutionImage.getPixelWriter();

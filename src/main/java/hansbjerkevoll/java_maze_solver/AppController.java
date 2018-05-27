@@ -30,7 +30,7 @@ public class AppController {
 			FileChooser filechooser = new FileChooser();
 			filechooser.setTitle("Open Resource File");
 			filechooser.getExtensionFilters()
-					.addAll(new ExtensionFilter("Image files", "*.png", "*.gif", "*.jpg", "*.jpeg"));
+					.addAll(new ExtensionFilter("Image files", "*.png", "*.gif", "*.jpg", "*.jpeg", "*.bmp"));
 
 			File selectedFile = filechooser.showOpenDialog((Stage) root.getScene().getWindow());
 			if (selectedFile != null) {
@@ -43,9 +43,11 @@ public class AppController {
 			if (filepath != null) {
 				try {
 					Image solveImage = new Image("file:////" + filepath);
+					long start = System.currentTimeMillis();
 					Image solutionImage = new MazeSolver().solveMaze(solveImage);
-
+					long end = System.currentTimeMillis();
 					imageview.setImage(resample(solutionImage));
+					Alerter.info("Maze solved!", "The maze was successfully solved in " + (end-start) + " ms.");
 
 				} catch (Exception e) {
 					e.printStackTrace();

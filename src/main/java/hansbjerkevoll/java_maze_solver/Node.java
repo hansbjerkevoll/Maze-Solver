@@ -32,20 +32,17 @@ public class Node {
 		this.color = "white";
 	}
 	
-	public Node(int x, int y, boolean start, boolean goal) {
-		this.x = x;
-		this.y = y;
-		this.depth = -1;
-		this.start = start;
-		this.goal = goal;
-		this.predecessor = null;
-		this.color = "white";
-	}
-	
-	
 	//Add neighbour Node
 	public void addNeighbour(Node node){
 		this.neighbours.add(node);
+	}
+	
+	public void setStart(boolean start) {
+		this.start = start;
+	}
+	
+	public void setGoal(boolean goal) {
+		this.goal = goal;
 	}
 	
 	

@@ -14,6 +14,7 @@ public static int bfs(Node source){
 			return source.getDepth();
 		}
 		
+		
 		source.setDepth(0);
 		source.color = "grey";
 		
@@ -33,6 +34,7 @@ public static int bfs(Node source){
 						neighbour.setPredecessor(currentNode);
 						return currentNode.getDepth() + 1;
 					}
+					
 				}
 			}
 			currentNode.color = "black";
